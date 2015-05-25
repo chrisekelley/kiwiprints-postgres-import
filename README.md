@@ -105,11 +105,11 @@ Import into trichiasis
 
 ## RefusedSurgery:
          
-    SELECT COUNT(DISTINCT refusedsurgeryl) AS refusedsurgeryl, gender, trichiasis.currentDistrict
-    FROM indiv_reg, trichiasis
-    WHERE indiv_reg._id = trichiasis.clientId
+    SELECT COUNT(t.refusedsurgeryl) as refusedsurgeryl , t.currentDistrict, i.gender
+    FROM trichiasis t, indiv_reg i
+    WHERE t.clientid = i._id
     AND refusedsurgeryl = 'true'
-    GROUP BY Gender, trichiasis.currentDistrict;
+    GROUP BY i.gender, t.currentDistrict;
              
     SELECT COUNT(DISTINCT refusedsurgeryr) AS refusedsurgeryr, gender
     FROM indiv_reg, trichiasis
