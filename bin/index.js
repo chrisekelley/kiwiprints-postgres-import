@@ -15,8 +15,8 @@ var settings =
       {
         couchdb: {
          url: 'http://localhost:5984',
-         pgtable:  'couchdocsJson',
-         database: 'coconut-moz-2015'
+         pgtable:  'couchdocs',
+         database: 'coconut-moz-2015-reports'
        }
       };
 

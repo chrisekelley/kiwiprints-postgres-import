@@ -21,14 +21,14 @@ change to this new db
       since numeric DEFAULT 0,
       enabled boolean DEFAULT false, --not used in the simple client example
       CONSTRAINT since_checkpoint_pkey PRIMARY KEY (pgtable)
-    )
+    );
 
     CREATE TABLE couchdocs
     (
       id text NOT NULL,
       doc jsonb,
       CONSTRAINT couchdocs_pkey PRIMARY KEY (id)
-    )
+    );
     
 Modify index.js to point to couchdocs 
 
@@ -37,7 +37,7 @@ Modify index.js to point to couchdocs
             couchdb: {
              url: 'http://localhost:5984',
              pgtable:  'couchdocsJson',
-             database: 'coconut-moz-2015'
+             database: 'coconut-moz-2015-reports'
            }
           };
 
@@ -60,11 +60,12 @@ Create indiv_reg table - note I had to change user to savedBy - user is a reserv
 
     CREATE TABLE indiv_reg (_id text, _rev text, District text, Gender text, DOB text, registrationLocation text, 
     previouslyRegisterredNowOffline text, question text, collection text, createdAt timestamp, lastModifiedAt timestamp, 
-    complete text, currentDistrict text, savedBy text);
+    complete text, currentDistrict text, savedBy text,
+    CONSTRAINT indiv_reg_pkey PRIMARY KEY (_id));
     
 Create trichiasis table - note I had to change user to savedBy - user is a reserved word in postgres.
 
-    CREATE TABLE trichiasis (id text,_rev text,question text,collection text,createdAt timestamp,lastModifiedAt timestamp,serviceLocation text,
+    CREATE TABLE trichiasis (_id text,_rev text,question text,collection text,createdAt timestamp,lastModifiedAt timestamp,serviceLocation text,
     DateOfVisit text,TimeOfVisit text,RefusedSurgeryL text,ProvidedEpilationConsultationL text,visualAcuityL text,
     countLashesTouchingEyeballL text,evidenceOfEpilationL text,photographPreOpL text,cataractL text,cornealOpacityL text,
     acceptedSurgeryL text,TypeofOperationL text,ClampusedL text,SutureTypeL text,ExcessbleedingL text,MarginfragmantseveredL text,
@@ -72,49 +73,48 @@ Create trichiasis table - note I had to change user to savedBy - user is a reser
     visualAcuityR text,countLashesTouchingEyeballR text,evidenceOfEpilationR text,photographPreOpR text,cataractR text,
     cornealOpacityR text,acceptedSurgeryR text,TypeofOperationR text,ClampusedR text,SutureTypeR text,ExcessbleedingR text,
     MarginfragmantseveredR text,GlobePunctureR text,ComplicationsReferralR text,ReferralHospitalR text,complete text,
-    currentDistrict text,savedBy text,clientId text,latitude double precision,longitude double precision, gps_timestamp timestamp);
+    currentDistrict text,savedBy text,clientId text,latitude double precision,longitude double precision, gps_timestamp timestamp,
+    CONSTRAINT trichiasis_pkey PRIMARY KEY (_id));
     
 Import into indiv_reg
 
       INSERT INTO indiv_reg
-      SELECT doc->'_id',doc->'_rev',doc->'District',doc->'Gender',doc->'DOB',doc->'registrationLocation',
-      doc->'previouslyRegisterredNowOffline',doc->'question',doc->'collection',(doc->'createdAt')::text::timestamp,
-      (doc->'lastModifiedAt')::text::timestamp,
-      doc->'complete',doc->'currentDistrict',doc->'savedBy' FROM couchdocs WHERE doc @> '{"question":"Individual Registration" }';
+      select doc->>'_id',doc->>'_rev',doc->>'District',doc->>'Gender',doc->>'DOB',doc->>'registrationLocation',doc->>'previouslyRegisterredNowOffline',doc->>'question',doc->>'collection',(doc->>'createdAt')::text::timestamp,(doc->>'lastModifiedAt')::text::timestamp,doc->>'complete',doc->'currentDistrict',doc->>'savedBy'
+      from couchdocs WHERE doc @> '{"question":"Individual Registration" }';
 
 Import into trichiasis
 
       INSERT INTO trichiasis
-      SELECT doc->'_id',doc->'_rev',doc->'question',doc->'collection',(doc->'createdAt')::text::timestamp,
-      (doc->'lastModifiedAt')::text::timestamp,doc->'serviceLocation',
-      doc->'DateOfVisit',doc->'TimeOfVisit',doc->'RefusedSurgeryL',doc->'ProvidedEpilationConsultationL',doc->'visualAcuityL',
-      doc->'countLashesTouchingEyeballL',doc->'evidenceOfEpilationL',doc->'photographPreOpL',doc->'cataractL',doc->'cornealOpacityL',
-      doc->'acceptedSurgeryL',doc->'TypeofOperationL',doc->'ClampusedL',doc->'SutureTypeL',doc->'ExcessbleedingL',
-      doc->'MarginfragmantseveredL',doc->'GlobePunctureL',doc->'ComplicationsReferralL',doc->'ReferralHospitalL',
-      doc->'RefusedSurgeryR',doc->'ProvidedEpilationConsultationR',doc->'visualAcuityR',doc->'countLashesTouchingEyeballR',
-      doc->'evidenceOfEpilationR',doc->'photographPreOpR',doc->'cataractR',doc->'cornealOpacityR',doc->'acceptedSurgeryR',
-      doc->'TypeofOperationR',doc->'ClampusedR',doc->'SutureTypeR',doc->'ExcessbleedingR',doc->'MarginfragmantseveredR',
-      doc->'GlobePunctureR',doc->'ComplicationsReferralR',doc->'ReferralHospitalR',doc->'complete',doc->'currentDistrict',
-      doc->'user',doc->'clientId',
-      (doc->'currentPosition' ->'coords'->'longitude')::text::double precision AS longitude, 
-      (doc->'currentPosition' ->'coords'->'latitude')::text::double precision AS latitude, 
-      to_timestamp((doc->'currentPosition' ->'timestamp')::text::double precision) AS gps_timestamp 
+      SELECT doc->>'_id',doc->>'_rev',doc->>'question',doc->>'collection',(doc->>'createdAt')::text::timestamp,
+      (doc->>'lastModifiedAt')::text::timestamp,doc->>'serviceLocation',
+      doc->>'DateOfVisit',doc->>'TimeOfVisit',doc->>'RefusedSurgeryL',doc->>'ProvidedEpilationConsultationL',doc->>'visualAcuityL',
+      doc->>'countLashesTouchingEyeballL',doc->>'evidenceOfEpilationL',doc->>'photographPreOpL',doc->>'cataractL',doc->>'cornealOpacityL',
+      doc->>'acceptedSurgeryL',doc->>'TypeofOperationL',doc->>'ClampusedL',doc->>'SutureTypeL',doc->>'ExcessbleedingL',
+      doc->>'MarginfragmantseveredL',doc->>'GlobePunctureL',doc->>'ComplicationsReferralL',doc->>'ReferralHospitalL',
+      doc->>'RefusedSurgeryR',doc->>'ProvidedEpilationConsultationR',doc->>'visualAcuityR',doc->>'countLashesTouchingEyeballR',
+      doc->>'evidenceOfEpilationR',doc->>'photographPreOpR',doc->>'cataractR',doc->>'cornealOpacityR',doc->>'acceptedSurgeryR',
+      doc->>'TypeofOperationR',doc->>'ClampusedR',doc->>'SutureTypeR',doc->>'ExcessbleedingR',doc->>'MarginfragmantseveredR',
+      doc->>'GlobePunctureR',doc->>'ComplicationsReferralR',doc->>'ReferralHospitalR',doc->>'complete',doc->>'currentDistrict',
+      doc->>'user',doc->>'clientId',
+      (doc->'currentPosition' ->'coords'->>'longitude')::text::double precision AS longitude, 
+      (doc->'currentPosition' ->'coords'->>'latitude')::text::double precision AS latitude, 
+      to_timestamp((doc->'currentPosition' ->>'timestamp')::text::double precision) AS gps_timestamp 
       FROM couchdocs WHERE doc @> '{"question":"Trichiasis Surgery" }';
       
 # Report SQL
 
 ## RefusedSurgery:
          
-    SELECT COUNT(DISTINCT refusedsurgeryl) AS refusedsurgeryl, gender
+    SELECT COUNT(DISTINCT refusedsurgeryl) AS refusedsurgeryl, gender, trichiasis.currentDistrict
     FROM indiv_reg, trichiasis
     WHERE indiv_reg._id = trichiasis.clientId
-    AND refusedsurgeryl = '"true"'
-    GROUP BY Gender;
+    AND refusedsurgeryl = 'true'
+    GROUP BY Gender, trichiasis.currentDistrict;
              
     SELECT COUNT(DISTINCT refusedsurgeryr) AS refusedsurgeryr, gender
     FROM indiv_reg, trichiasis
     WHERE indiv_reg._id = trichiasis.clientId
-    AND refusedsurgeryr = '"true"'
+    AND refusedsurgeryr = 'true'
     GROUP BY Gender;
     
 ## Operations
