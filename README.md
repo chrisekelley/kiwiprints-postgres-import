@@ -9,7 +9,7 @@ Basically it allows postgres to use couchdb as its datastore - sort of like a Fo
 
 # KiwiPrints implementation notes
 
-    CREATE DATABASE kiwiprints
+    CREATE DATABASE kiwiprints;
 
 change to this new db
 
@@ -30,20 +30,27 @@ change to this new db
       CONSTRAINT couchdocs_pkey PRIMARY KEY (id)
     );
     
-Modify index.js to point to couchdocs 
+Modify the environment variables to your databasesettings:
+
+    export COUCHDB_URL=https://somewhere.com
+    export COUCHDB_USERNAME=user
+    export COUCHDB_PASSWORD=password
+    export COUCHDB_DATABASE=couchdb
+
+These will override the settings:
 
     var settings =
           {
             couchdb: {
              url: 'http://localhost:5984',
-             pgtable:  'couchdocsJson',
+             pgtable:  'couchdocs',
              database: 'coconut-moz-2015-reports'
            }
           };
 
 Import from couchdb
 
-    source/couch-to-postgres]$ ./bin/index.js  
+    source/kiwiprints-to-postgres]$ ./bin/index.js  
     
 Create logs table:
 
@@ -103,6 +110,29 @@ Import into trichiasis
       
 # Report SQL
 
+## View records from indiv_reg:
+
+    SELECT gender,dob,registrationlocation,previouslyregisterrednowoffline, question, collection, createdat, lastmodifiedat,complete, currentdistrict,savedby
+    from indiv_reg
+    ORDER BY lastmodifiedat DESC;   
+     
+## View records from trichiasis
+
+    SELECT _id,_rev,question,collection,createdat,lastmodifiedat,servicelocation,dateofvisit,timeofvisit,refusedsurgeryl,providedepilationconsultationl,
+    visualacuityl,countlashestouchingeyeballl,evidenceofepilationl,photographpreopl,cataractl,cornealopacityl,acceptedsurgeryl,
+    typeofoperationl,clampusedl,suturetypel,excessbleedingl,marginfragmantseveredl,globepuncturel,complicationsreferrall,
+    referralhospitall,refusedsurgeryr,providedepilationconsultationr,visualacuityr,countlashestouchingeyeballr,evidenceofepilationr,
+    photographpreopr,cataractr,cornealopacityr,acceptedsurgeryr,typeofoperationr,clampusedr,suturetyper,excessbleedingr,
+    marginfragmantseveredr,globepuncturer,complicationsreferralr,referralhospitalr,complete,currentdistrict,savedby,clientid,
+    latitude,longitude,gps_timestamp
+    from trichiasis
+    ORDER BY lastmodifiedat DESC;  
+    
+    SELECT lastmodifiedat,dateofvisit,timeofvisit,refusedsurgeryl,providedepilationconsultationl,
+    typeofoperationl,refusedsurgeryr,providedepilationconsultationr,typeofoperationr,currentdistrict
+    from trichiasis
+    ORDER BY lastmodifiedat DESC;  
+
 ## RefusedSurgery:
          
     SELECT COUNT(t.refusedsurgeryl) as refusedsurgeryl , t.currentDistrict, i.gender
@@ -111,25 +141,146 @@ Import into trichiasis
     AND refusedsurgeryl = 'true'
     GROUP BY i.gender, t.currentDistrict;
              
-    SELECT COUNT(DISTINCT refusedsurgeryr) AS refusedsurgeryr, gender
-    FROM indiv_reg, trichiasis
-    WHERE indiv_reg._id = trichiasis.clientId
+    SELECT COUNT(DISTINCT refusedsurgeryr) AS refusedsurgeryr , t.currentDistrict, i.gender
+    FROM indiv_reg i, trichiasis t
+    WHERE i._id = t.clientId
     AND refusedsurgeryr = 'true'
-    GROUP BY Gender;
+    GROUP BY i.gender, t.currentDistrict;
     
 ## Operations
 
-    SELECT COUNT(trichiasis.*) AS operations, gender
-    FROM indiv_reg, trichiasis
-    WHERE indiv_reg._id = trichiasis.clientId
-    GROUP BY Gender;
+    SELECT COUNT(t.*) AS operations, t.currentDistrict, i.gender
+    FROM indiv_reg i, trichiasis t
+    WHERE i._id = t.clientId
+    GROUP BY i.gender, t.currentDistrict;
 
 Then subtract the counts from RefusedSurgery.
 
 ## Eyelids operated
 
+    SELECT t.lastmodifiedat, t.typeofoperationl, t.typeofoperationr , t.currentDistrict, i.gender
+    FROM trichiasis t, indiv_reg i
+    WHERE t.clientid = i._id
+    AND typeofoperationl != ''
+    ORDER BY t.lastmodifiedat DESC; 
 
+    SELECT COUNT(t.typeofoperationl) as typeofoperationl , t.currentDistrict, i.gender
+    FROM trichiasis t, indiv_reg i
+    WHERE t.clientid = i._id
+    AND typeofoperationl != ''
+    GROUP BY i.gender, t.currentDistrict;
+    
+    SELECT COUNT(t.TypeofOperationR) as TypeofOperationR , t.currentDistrict, i.gender
+    FROM trichiasis t, indiv_reg i
+    WHERE t.clientid = i._id
+    AND TypeofOperationR != ''
+    GROUP BY i.gender, t.currentDistrict;
+    
+    SELECT COUNT(t.TypeofOperationR) as TypeofOperationR , t.currentDistrict, i.gender
+    FROM trichiasis t, indiv_reg i
+    WHERE t.clientid = i._id
+    AND TypeofOperationR != ''
+    AND typeofoperationl != ''
+    GROUP BY i.gender, t.currentDistrict;
 
+## Eyelids Epilated
+
+    SELECT COUNT(t.providedepilationconsultationl) as providedepilationconsultationl , t.currentDistrict, i.gender
+    FROM trichiasis t, indiv_reg i
+    WHERE t.clientid = i._id
+    AND providedepilationconsultationl != ''
+    GROUP BY i.gender, t.currentDistrict;
+    
+    SELECT COUNT(t.providedepilationconsultationr) as providedepilationconsultationr , t.currentDistrict, i.gender
+    FROM trichiasis t, indiv_reg i
+    WHERE t.clientid = i._id
+    AND providedepilationconsultationr != ''
+    GROUP BY i.gender, t.currentDistrict;
+    
+    SELECT COUNT(t.providedepilationconsultationl) as providedepilationconsultationl , t.currentDistrict, i.gender
+    FROM trichiasis t, indiv_reg i
+    WHERE t.clientid = i._id
+    AND providedepilationconsultationl != ''
+    GROUP BY i.gender, t.currentDistrict;
+    
+## Failed surgeries
+
+    SELECT lastmodifiedat,
+    excessbleedingl,marginfragmantseveredl,globepuncturel,complicationsreferrall,
+    excessbleedingr,marginfragmantseveredr,globepuncturer,complicationsreferralr
+    from trichiasis
+    ORDER BY lastmodifiedat DESC;  
+    
+    SELECT COUNT(t.excessbleedingl) as excessbleedingl , t.currentDistrict, i.gender
+    FROM trichiasis t, indiv_reg i
+    WHERE t.clientid = i._id
+    AND excessbleedingl != ''
+    GROUP BY i.gender, t.currentDistrict;
+    
+    SELECT COUNT(t.marginfragmantseveredl) as marginfragmantseveredl , t.currentDistrict, i.gender
+    FROM trichiasis t, indiv_reg i
+    WHERE t.clientid = i._id
+    AND marginfragmantseveredl != ''
+    GROUP BY i.gender, t.currentDistrict;
+    
+    SELECT COUNT(t.globepuncturel) as globepuncturel , t.currentDistrict, i.gender
+    FROM trichiasis t, indiv_reg i
+    WHERE t.clientid = i._id
+    AND globepuncturel != ''
+    GROUP BY i.gender, t.currentDistrict;
+    
+    SELECT COUNT(t.complicationsreferrall) as complicationsreferrall , t.currentDistrict, i.gender
+    FROM trichiasis t, indiv_reg i
+    WHERE t.clientid = i._id
+    AND complicationsreferrall != ''
+    GROUP BY i.gender, t.currentDistrict;
+    
+    SELECT COUNT(t.excessbleedingr) as excessbleedingr , t.currentDistrict, i.gender
+    FROM trichiasis t, indiv_reg i
+    WHERE t.clientid = i._id
+    AND excessbleedingr != ''
+    GROUP BY i.gender, t.currentDistrict;
+    
+    SELECT COUNT(t.marginfragmantseveredr) as marginfragmantseveredr , t.currentDistrict, i.gender
+    FROM trichiasis t, indiv_reg i
+    WHERE t.clientid = i._id
+    AND marginfragmantseveredr != ''
+    GROUP BY i.gender, t.currentDistrict;
+    
+    SELECT COUNT(t.globepuncturer) as globepuncturer , t.currentDistrict, i.gender
+    FROM trichiasis t, indiv_reg i
+    WHERE t.clientid = i._id
+    AND globepuncturer != ''
+    GROUP BY i.gender, t.currentDistrict;
+    
+    SELECT COUNT(t.complicationsreferralr) as complicationsreferralr , t.currentDistrict, i.gender
+    FROM trichiasis t, indiv_reg i
+    WHERE t.clientid = i._id
+    AND complicationsreferralr != ''
+    GROUP BY i.gender, t.currentDistrict;
+    
+    SELECT COUNT(t.excessbleedingl) as excessbleedingl,COUNT(t.marginfragmantseveredl) as marginfragmantseveredl,
+    COUNT(t.globepuncturel) as globepuncturel, 
+    COUNT(t.complicationsreferrall) as complicationsreferrall, 
+    COUNT(t.excessbleedingr) as excessbleedingr, 
+    COUNT(t.marginfragmantseveredr) as marginfragmantseveredr, 
+    COUNT(t.globepuncturer) as globepuncturer, 
+    COUNT(t.complicationsreferralr) as complicationsreferralr, 
+    t.currentDistrict, i.gender
+    FROM trichiasis t, indiv_reg i
+    WHERE t.clientid = i._id
+    AND (
+    excessbleedingl != ''
+    OR marginfragmantseveredl != ''
+    OR globepuncturel != ''
+    OR complicationsreferrall != ''
+    OR excessbleedingr != ''
+    OR marginfragmantseveredr != ''
+    OR globepuncturer != ''
+    OR complicationsreferralr != ''
+    )
+    GROUP BY i.gender, t.currentDistrict;
+    
 # Original README continues
 
 For example:
