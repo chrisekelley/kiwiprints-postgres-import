@@ -52,25 +52,21 @@ Import from couchdb
 
     source/kiwiprints-to-postgres]$ ./bin/index.js  
     
-Create logs table:
+-- Create logs table:
 
     CREATE TABLE logs (_id text, _rev text, uuid text, error text, model text, cordova text, message text, version text, 
     platform text, timestamp text, collection text);
 
-Import into logs
 
-    INSERT INTO logs
-    SELECT doc->'_id', doc->'_rev', doc->'uuid', doc->'error', doc->'model', doc->'cordova', doc->'message', doc->'version', 
-    doc->'platform', doc->'timestamp', doc->'collection' FROM couchdocs WHERE doc @> '{"collection":"log" }';
     
-Create indiv_reg table - note I had to change user to savedBy - user is a reserved word in postgres.
+   -- Create indiv_reg table - note I had to change user to savedBy - user is a reserved word in postgres.
 
     CREATE TABLE indiv_reg (_id text, _rev text, District text, Gender text, DOB text, registrationLocation text, 
     previouslyRegisterredNowOffline text, question text, collection text, createdAt timestamp, lastModifiedAt timestamp, 
     complete text, currentDistrict text, savedBy text,
     CONSTRAINT indiv_reg_pkey PRIMARY KEY (_id));
     
-Create trichiasis table - note I had to change user to savedBy - user is a reserved word in postgres.
+   -- Create trichiasis table - note I had to change user to savedBy - user is a reserved word in postgres.
 
     CREATE TABLE trichiasis (_id text,_rev text,question text,collection text,createdAt timestamp,lastModifiedAt timestamp,serviceLocation text,
     DateOfVisit text,TimeOfVisit text,RefusedSurgeryL text,ProvidedEpilationConsultationL text,visualAcuityL text,
@@ -83,30 +79,64 @@ Create trichiasis table - note I had to change user to savedBy - user is a reser
     currentDistrict text,savedBy text,clientId text,latitude double precision,longitude double precision, gps_timestamp timestamp,
     CONSTRAINT trichiasis_pkey PRIMARY KEY (_id));
     
-Import into indiv_reg
+   -- Create Post-Operative Followup
 
-      INSERT INTO indiv_reg
-      select doc->>'_id',doc->>'_rev',doc->>'District',doc->>'Gender',doc->>'DOB',doc->>'registrationLocation',doc->>'previouslyRegisterredNowOffline',doc->>'question',doc->>'collection',(doc->>'createdAt')::text::timestamp,(doc->>'lastModifiedAt')::text::timestamp,doc->>'complete',doc->'currentDistrict',doc->>'savedBy'
-      from couchdocs WHERE doc @> '{"question":"Individual Registration" }';
+    CREATE TABLE post_operative_followup (_id text,_rev text,question text,collection text,createdAt timestamp,lastModifiedAt timestamp,serviceLocation text,
+    DateOfVisit text,TimeOfVisit text,CompletedTreatment boolean, ComplicationsReferralR  boolean, Complicationsrefertoclinichospital  boolean,
+    Continuemonitoring boolean, Followupdate text,Nameofprocedurebeingfollowed text,Recurrence boolean,
+    ReferralHospitalR text,complete  boolean, currentDistrict text,savedBy text,clientId text,latitude double precision,longitude double precision, 
+    gps_timestamp timestamp,
+    CONSTRAINT post_operative_followup_pkey PRIMARY KEY (_id));
+    
+   -- Create Post-Operative Epilation
 
-Import into trichiasis
+    CREATE TABLE post_operative_epilation (_id text,_rev text,question text,collection text,createdAt timestamp,lastModifiedAt timestamp,serviceLocation text,
+    DateOfVisit text,TimeOfVisit text,
+    adviceForSurgeryL text,adviceForSurgeryR text,cornealOpacityL text,cornealOpacityR text,countLashesTouchingEyeballL text,countLashesTouchingEyeballR text,
+            Observations text,visualAcuityL text,visualAcuityR text,
+    complete  boolean, currentDistrict text,savedBy text,clientId text,latitude double precision,longitude double precision, 
+    gps_timestamp timestamp,
+    CONSTRAINT post_operative_epilation_pkey PRIMARY KEY (_id));
+    
+   -- Create Post-Operative Followup 1 day
 
-      INSERT INTO trichiasis
-      SELECT doc->>'_id',doc->>'_rev',doc->>'question',doc->>'collection',(doc->>'createdAt')::text::timestamp,
-      (doc->>'lastModifiedAt')::text::timestamp,doc->>'serviceLocation',
-      doc->>'DateOfVisit',doc->>'TimeOfVisit',doc->>'RefusedSurgeryL',doc->>'ProvidedEpilationConsultationL',doc->>'visualAcuityL',
-      doc->>'countLashesTouchingEyeballL',doc->>'evidenceOfEpilationL',doc->>'photographPreOpL',doc->>'cataractL',doc->>'cornealOpacityL',
-      doc->>'acceptedSurgeryL',doc->>'TypeofOperationL',doc->>'ClampusedL',doc->>'SutureTypeL',doc->>'ExcessbleedingL',
-      doc->>'MarginfragmantseveredL',doc->>'GlobePunctureL',doc->>'ComplicationsReferralL',doc->>'ReferralHospitalL',
-      doc->>'RefusedSurgeryR',doc->>'ProvidedEpilationConsultationR',doc->>'visualAcuityR',doc->>'countLashesTouchingEyeballR',
-      doc->>'evidenceOfEpilationR',doc->>'photographPreOpR',doc->>'cataractR',doc->>'cornealOpacityR',doc->>'acceptedSurgeryR',
-      doc->>'TypeofOperationR',doc->>'ClampusedR',doc->>'SutureTypeR',doc->>'ExcessbleedingR',doc->>'MarginfragmantseveredR',
-      doc->>'GlobePunctureR',doc->>'ComplicationsReferralR',doc->>'ReferralHospitalR',doc->>'complete',doc->>'currentDistrict',
-      doc->>'user',doc->>'clientId',
-      (doc->'currentPosition' ->'coords'->>'longitude')::text::double precision AS longitude, 
-      (doc->'currentPosition' ->'coords'->>'latitude')::text::double precision AS latitude, 
-      to_timestamp((doc->'currentPosition' ->>'timestamp')::text::double precision) AS gps_timestamp 
-      FROM couchdocs WHERE doc @> '{"question":"Trichiasis Surgery" }';
+    CREATE TABLE post_operative_followup_1day (_id text,_rev text,question text,collection text,createdAt timestamp,lastModifiedAt timestamp,serviceLocation text,
+    DateOfVisit text,TimeOfVisit text,
+    azithromycinR boolean, tetracyclineEyeOintmentR boolean,
+    complete  boolean, currentDistrict text,savedBy text,clientId text,latitude double precision,longitude double precision, 
+    gps_timestamp timestamp,
+    CONSTRAINT post_operative_followup_1day_pkey PRIMARY KEY (_id));
+    
+   -- Create Post-Operative Followup 3_6_months
+
+    CREATE TABLE post_operative_followup_3_6_months (_id text,_rev text,question text,collection text,createdAt timestamp,lastModifiedAt timestamp,serviceLocation text,
+    DateOfVisit text,TimeOfVisit text,
+    countLashesTouchingEyeballL text,countLashesTouchingEyeballR text,outcomeL text,outcomeR text,patientDevelopedTrichiasisL boolean,patientDevelopedTrichiasisR boolean,
+    complete boolean, currentDistrict text,savedBy text,clientId text,latitude double precision,longitude double precision, 
+    gps_timestamp timestamp,
+    CONSTRAINT postopefollowup_3_6months_pkey PRIMARY KEY (_id));
+    
+   -- Create Post-Operative Followup 7_14_days
+
+    CREATE TABLE post_operative_followup_7_14_days (_id text,_rev text,question text,collection text,createdAt timestamp,lastModifiedAt timestamp,serviceLocation text,
+    DateOfVisit text,TimeOfVisit text,
+    defectsEyelidL boolean,defectsEyelidR boolean,granulomaExcisionL boolean,granulomaExcisionR boolean,
+    granulomaL boolean,granulomaR boolean,infectionL boolean,infectionR boolean,numberReturnInDaysMonthsL text,numberReturnInDaysMonthsR text,
+    referredToHospitalL boolean,referredToHospitalR boolean,referredToHospitalTextL text,referredToHospitalTextR text,
+    removalOfSuturesL boolean,removalOfSuturesR boolean,returnForFollowupL boolean,returnForFollowupR boolean,returnInDaysMonthsL text,
+    returnInDaysMonthsR text,subCorrectionL boolean,subCorrectionR boolean, 
+    complete boolean, currentDistrict text,savedBy text,clientId text,latitude double precision,longitude double precision, 
+    gps_timestamp timestamp,
+    CONSTRAINT post_operative_followup_7_14_days_pkey PRIMARY KEY (_id));
+
+
+# Running the importer
+ 
+    ./bin/index.js 
+
+Run the sql/refresh.sql script to delete current records and import everything:
+
+    psql -d kiwiprints -a -f sql/refresh.sql 
       
 # Report SQL
 
@@ -281,6 +311,10 @@ Then subtract the counts from RefusedSurgery.
     )
     GROUP BY i.gender, t.currentDistrict;
     
+## Recurrence
+
+  TBD
+
 # Original README continues
 
 For example:
