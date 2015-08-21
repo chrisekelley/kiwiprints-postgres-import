@@ -1,0 +1,11 @@
+DELETE FROM logs;
+DELETE FROM indiv_reg;
+DELETE FROM admin_reg;
+DELETE FROM trichiasis;
+DELETE FROM post_operative_followup;
+DELETE FROM post_operative_epilation;
+DELETE FROM post_operative_followup_1day;
+DELETE FROM post_operative_followup_3_6_months;
+DELETE FROM post_operative_followup_7_14_days;
+DELETE FROM couchdocs;
+DELETE FROM since_checkpoints;

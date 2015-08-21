@@ -1,0 +1,11 @@
+DROP TABLE logs;
+DROP TABLE indiv_reg;
+DROP TABLE admin_reg;
+DROP TABLE trichiasis;
+DROP TABLE post_operative_followup;
+DROP TABLE post_operative_epilation;
+DROP TABLE post_operative_followup_1day;
+DROP TABLE post_operative_followup_3_6_months;
+DROP TABLE post_operative_followup_7_14_days;
+DROP TABLE couchdocs;
+DROP TABLE since_checkpoints;

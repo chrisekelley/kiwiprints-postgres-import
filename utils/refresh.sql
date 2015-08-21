@@ -1,11 +1,14 @@
-DROP TABLE logs;
-DROP TABLE indiv_reg;
-DROP TABLE trichiasis;
-DROP TABLE post_operative_followup;
-DROP TABLE post_operative_epilation;
-DROP TABLE post_operative_followup_1day;
-DROP TABLE post_operative_followup_3_6_months;
-DROP TABLE post_operative_followup_7_14_days;
+DELETE FROM logs;
+DELETE FROM indiv_reg;
+DELETE FROM trichiasis;
+DELETE FROM post_operative_followup;
+DELETE FROM post_operative_epilation;
+DELETE FROM post_operative_followup_1day;
+DELETE FROM post_operative_followup_3_6_months;
+DELETE FROM post_operative_followup_7_14_days;
+--DELETE FROM couchdocs;
+--DELETE FROM since_checkpoints;
+
 
    -- Import into logs
 
