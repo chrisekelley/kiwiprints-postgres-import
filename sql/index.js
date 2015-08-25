@@ -6,7 +6,7 @@ module.exports = {
   "doc->>'clientId', doc->>'version_code', doc->>'serviceUuid', doc->>'createdByOfflineUser', " +
   "(doc->'currentPosition' ->'coords'->>'latitude')::text::double precision AS latitude, " +
   "(doc->'currentPosition' ->'coords'->>'longitude')::text::double precision AS longitude, " +
-  "to_timestamp((doc->'currentPosition' ->>'timestamp')::text::double precision) AS gps_timestamp,doc->>'gpsCity',doc->>'deviceUuid' " +
+  "to_timestamp((doc->'currentPosition' ->>'timestamp')::text::double precision / 1000) AS gps_timestamp,doc->>'gps_name',doc->>'gps_city',doc->>'gps_country',doc->>'deviceUuid' " +
   "FROM couchdocs ",
   //"WHERE doc @> '{\"question\":\"Individual Registration\" }';",
 
@@ -17,7 +17,7 @@ module.exports = {
   "doc->>'clientId', doc->>'version_code', doc->>'serviceUuid', doc->>'createdByOfflineUser', " +
   "(doc->'currentPosition' ->'coords'->>'latitude')::text::double precision AS latitude, " +
   "(doc->'currentPosition' ->'coords'->>'longitude')::text::double precision AS longitude, " +
-  "to_timestamp((doc->'currentPosition' ->>'timestamp')::text::double precision) AS gps_timestamp,doc->>'gpsCity',doc->>'deviceUuid' " +
+  "to_timestamp((doc->'currentPosition' ->>'timestamp')::text::double precision / 1000) AS gps_timestamp,doc->>'gps_name',doc->>'gps_city',doc->>'gps_country',doc->>'deviceUuid' " +
 "FROM couchdocs ",
   //"WHERE doc @> '{\"question\":\"Individual Registration\" }';",
 
@@ -35,7 +35,7 @@ module.exports = {
   "doc->>'clientId',  doc->>'version_code', doc->>'serviceUuid', doc->>'createdByOfflineUser', " +
   "(doc->'currentPosition' ->'coords'->>'latitude')::text::double precision AS latitude, " +
   "(doc->'currentPosition' ->'coords'->>'longitude')::text::double precision AS longitude, " +
-"to_timestamp((doc->'currentPosition' ->>'timestamp')::text::double precision) AS gps_timestamp,doc->>'gpsCity',doc->>'deviceUuid' " +
+"to_timestamp((doc->'currentPosition' ->>'timestamp')::text::double precision / 1000) AS gps_timestamp,doc->>'gps_name',doc->>'gps_city',doc->>'gps_country',doc->>'deviceUuid' " +
 "FROM couchdocs ",
   //"WHERE doc @> '{\"question\":\"Trichiasis Surgery\" }';",
 
@@ -49,7 +49,7 @@ module.exports = {
   "doc->>'clientId',  doc->>'version_code', doc->>'serviceUuid', doc->>'createdByOfflineUser', " +
   "(doc->'currentPosition' ->'coords'->>'latitude')::text::double precision AS latitude, " +
   "(doc->'currentPosition' ->'coords'->>'longitude')::text::double precision AS longitude, " +
-"to_timestamp((doc->'currentPosition' ->>'timestamp')::text::double precision) AS gps_timestamp,doc->>'gpsCity',doc->>'deviceUuid' " +
+"to_timestamp((doc->'currentPosition' ->>'timestamp')::text::double precision / 1000) AS gps_timestamp,doc->>'gps_name',doc->>'gps_city',doc->>'gps_country',doc->>'deviceUuid' " +
 "FROM couchdocs ",
   //"WHERE doc @> '{\"question\":\"Post-Operative Followup\" }';",
 
@@ -62,7 +62,7 @@ module.exports = {
   "doc->>'clientId',  doc->>'version_code', doc->>'serviceUuid', doc->>'createdByOfflineUser', " +
   "(doc->'currentPosition' ->'coords'->>'latitude')::text::double precision AS latitude, " +
   "(doc->'currentPosition' ->'coords'->>'longitude')::text::double precision AS longitude, " +
-    "to_timestamp((doc->'currentPosition' ->>'timestamp')::text::double precision) AS gps_timestamp,doc->>'gpsCity',doc->>'deviceUuid' " +
+    "to_timestamp((doc->'currentPosition' ->>'timestamp')::text::double precision / 1000) AS gps_timestamp,doc->>'gps_name',doc->>'gps_city',doc->>'gps_country',doc->>'deviceUuid' " +
     "FROM couchdocs ",
   //"WHERE doc @> '{\"question\":\"PostOperativeEpilation\" }';",
 
@@ -74,7 +74,7 @@ module.exports = {
   "doc->>'clientId',  doc->>'version_code', doc->>'serviceUuid', doc->>'createdByOfflineUser', " +
   "(doc->'currentPosition' ->'coords'->>'latitude')::text::double precision AS latitude, " +
   "(doc->'currentPosition' ->'coords'->>'longitude')::text::double precision AS longitude, " +
-    "to_timestamp((doc->'currentPosition' ->>'timestamp')::text::double precision) AS gps_timestamp,doc->>'gpsCity',doc->>'deviceUuid' " +
+    "to_timestamp((doc->'currentPosition' ->>'timestamp')::text::double precision / 1000) AS gps_timestamp,doc->>'gps_name',doc->>'gps_city',doc->>'gps_country',doc->>'deviceUuid' " +
     "FROM couchdocs ",
   //"WHERE doc @> '{\"question\":\"PostOperativeFollowup_1day\" }';",
 
@@ -87,7 +87,7 @@ module.exports = {
   "doc->>'clientId', doc->>'version_code', doc->>'serviceUuid', doc->>'createdByOfflineUser', " +
   "(doc->'currentPosition' ->'coords'->>'latitude')::text::double precision AS latitude, " +
   "(doc->'currentPosition' ->'coords'->>'longitude')::text::double precision AS longitude, " +
-    "to_timestamp((doc->'currentPosition' ->>'timestamp')::text::double precision) AS gps_timestamp,doc->>'gpsCity',doc->>'deviceUuid' " +
+    "to_timestamp((doc->'currentPosition' ->>'timestamp')::text::double precision / 1000) AS gps_timestamp,doc->>'gps_name',doc->>'gps_city',doc->>'gps_country',doc->>'deviceUuid' " +
     "FROM couchdocs ",
   //"WHERE doc @> '{\"question\":\"PostOperativeFollowup_3_6_months\" }';",
 
@@ -105,7 +105,7 @@ module.exports = {
     "doc->>'clientId',  doc->>'version_code', doc->>'serviceUuid', doc->>'createdByOfflineUser', " +
   "(doc->'currentPosition' ->'coords'->>'latitude')::text::double precision AS latitude, " +
   "(doc->'currentPosition' ->'coords'->>'longitude')::text::double precision AS longitude, " +
-    "to_timestamp((doc->'currentPosition' ->>'timestamp')::text::double precision) AS gps_timestamp,doc->>'gpsCity',doc->>'deviceUuid' " +
+    "to_timestamp((doc->'currentPosition' ->>'timestamp')::text::double precision / 1000) AS gps_timestamp,doc->>'gps_name',doc->>'gps_city',doc->>'gps_country',doc->>'deviceUuid' " +
     "FROM couchdocs ",
   //"WHERE doc @> '{\"question\":\"PostOperativeFollowup_7_14_days\" }';"
 }
